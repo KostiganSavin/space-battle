@@ -1,46 +1,51 @@
 from unittest.mock import MagicMock, Mock
 import pytest
-from space_battle.game import Rotate, Vector, RotableAdapted
+from space_battle.game import Rotate
 
 
 def test_rotate_object():
-    uobj = {"direction": 1, "angular_velocity": 2, "direction_number": 8}
-    rotatable_object = RotableAdapted(uobj)
+    rotatable_object = MagicMock()
+    rotatable_object.get_direction = Mock(return_value=1)
+    rotatable_object.get_angular_velocity = Mock(return_value=2)
+    rotatable_object.get_direction_number = Mock(return_value=8)
+    rotatable_object.set_direction = Mock()
     Rotate(rotatable_object).execute()
-    assert rotatable_object.direction == 3
+    rotatable_object.set_direction.assert_called_once_with(3)
 
 
 def test_rotate_object_around():
-    uobj = {"direction": 1, "angular_velocity": 9, "direction_number": 8}
-    rotatable_object = RotableAdapted(uobj)
+    rotatable_object = MagicMock()
+    rotatable_object.get_direction = Mock(return_value=1)
+    rotatable_object.get_angular_velocity = Mock(return_value=9)
+    rotatable_object.get_direction_number = Mock(return_value=8)
+    rotatable_object.set_direction = Mock()
     Rotate(rotatable_object).execute()
-    assert rotatable_object.direction == 2
+    rotatable_object.set_direction.assert_called_once_with(2)
 
 
 def test_raises_error_cannot_get_direction():
-    uobj = {}
-    rotatable_object = RotableAdapted(uobj)
-    with pytest.raises(KeyError) as exc:
+    rotatable_object = MagicMock()
+    rotatable_object.get_direction = Mock(side_effect=Exception)
+    with pytest.raises(Exception):
         Rotate(rotatable_object).execute()
 
 
 def test_raises_error_cannot_get_angular_velocity():
-    uobj = {}
-    rotatable_object = RotableAdapted(uobj)
-    with pytest.raises(KeyError) as exc:
+    rotatable_object = MagicMock()
+    rotatable_object.get_angular_velocity = Mock(side_effect=Exception)
+    with pytest.raises(Exception):
         Rotate(rotatable_object).execute()
 
 
 def test_raises_error_cannot_get_direction_number():
-    uobj = {}
-    rotatable_object = RotableAdapted(uobj)
-    with pytest.raises(KeyError) as exc:
+    rotatable_object = MagicMock()
+    rotatable_object.get_direction_number = Mock(side_effect=Exception)
+    with pytest.raises(Exception):
         Rotate(rotatable_object).execute()
 
 
 def test_raises_error_cannot_set_direction():
-    uobj = MagicMock(spec_set=dict)
-    uobj.__setitem__ = Mock(side_effect=KeyError('direction'))
-    rotatable_object = RotableAdapted(uobj)
-    with pytest.raises(KeyError) as exc:
+    rotatable_object = MagicMock()
+    rotatable_object.set_direction = Mock(side_effect=Exception)
+    with pytest.raises(Exception):
         Rotate(rotatable_object).execute()
